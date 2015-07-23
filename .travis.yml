@@ -1,0 +1,44 @@
+# ProvStore interoperability tests
+#
+# This job assumes the following packages have been installed (these
+# are provided by the Travis CI build environment,
+# http://docs.travis-ci.com/user/ci-environment):
+#
+# git
+# curl
+# Python 2
+
+language: python
+
+python:
+  - 2.7
+
+addons:
+  apt:
+    packages:
+    - zlib1g-dev
+    - libxslt1-dev
+
+before_install:
+  - echo "Getting test cases..."
+  - git clone https://github.com/prov-suite/testcases testcases
+  - echo "Getting ProvPy package..."
+  - pip install prov
+  - prov-convert --version
+  - prov-compare --version
+  - echo "Getting test harness..."
+  - git clone https://github.com/prov-suite/interop-test-harness test-harness
+  - cd test-harness
+  - pip install -r requirements.txt
+  - echo "Creating local configuration files..."
+  - echo "PROV_TEST_CASES_DIR=$TRAVIS_BUILD_DIR/testcases" > config.properties
+  - echo "PROV_LOCAL_CONFIG_DIR=$TRAVIS_BUILD_DIR/test-harness/localconfig" >> config.properties
+  - echo "PROVPY_COMPARE_EXE=prov-compare" >> config.properties
+  - echo "PROVPY_SCRIPTS_DIR/prov-compare,=" >> config.properties
+# PROVSTORE_API_KEY value must be defined in Travis CI job configuration
+  - echo "API_KEY=$PROVSTORE_API_KEY" >> config.properties
+  - mkdir localconfig
+  - python prov_interop/customise-config.py config localconfig config.properties
+
+script: 
+  - nosetests -v prov_interop.interop_tests.test_provstore
