@@ -32,10 +32,10 @@ before_install:
   - pip install -r requirements.txt
   - echo "Creating local configuration..."
   - cp -r config localconfig
-  - python prov_interop/set-yaml-value.py localconfig/harness.yaml test-cases="$TRAVIS_BUILD_DIR/testcases"
+  - python prov_interop/set_yaml_value.py localconfig/harness.yaml test-cases="$TRAVIS_BUILD_DIR/testcases"
   - cat localconfig/*
 # PROVSTORE_API_KEY value must be defined in Travis CI job configuration
-  - python prov_interop/set-yaml-value.py localconfig/provstore.yaml ProvStore.authorization="ApiKey $PROVSTORE_API_KEY"
+  - python prov_interop/set_yaml_value.py localconfig/provstore.yaml ProvStore.authorization="ApiKey $PROVSTORE_API_KEY"
 
 script: 
   - nosetests -v prov_interop.interop_tests.test_provstore
