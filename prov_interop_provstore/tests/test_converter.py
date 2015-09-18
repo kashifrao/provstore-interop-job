@@ -1,4 +1,4 @@
-"""Unit tests for :mod:`prov_interop.provstore.converter`.
+"""Unit tests for :mod:`prov_interop_provstore.converter`.
 """
 # Copyright (c) 2015 University of Southampton
 #
@@ -37,7 +37,7 @@ from prov_interop import http
 from prov_interop import standards
 from prov_interop.component import ConfigError
 from prov_interop.converter import ConversionError
-from prov_interop.provstore.converter import ProvStoreConverter
+from prov_interop_provstore.converter import ProvStoreConverter
 
 class ProvStoreConverterTestCase(unittest.TestCase):
 
