@@ -100,7 +100,7 @@ class ProvStoreTestCase(ConverterTestCase):
       print("Using API key defined in " + ProvStoreTestCase.API_KEY_ENV)
     except KeyError:
       print("Using default API key defined in configuration file")
-    self.converter.configure(config)
+    super(ProvStoreTestCase, self).configure(config)
 
   def tearDown(self):
     super(ProvStoreTestCase, self).tearDown()
