@@ -21,21 +21,16 @@ addons:
     - libxslt1-dev
 
 before_install:
-  - echo "Getting test cases..."
-  - git clone https://github.com/prov-suite/testcases testcases
-  - echo "Getting ProvPy package for use as a comparator..."
-  - pip install prov
-  - prov-compare --version
   - echo "Getting test harness..."
-  - git clone https://github.com/prov-suite/interop-test-harness test-harness
-  - cd test-harness
-  - pip install -r requirements.txt
-  - echo "Creating local configuration..."
-  - cp -r config localconfig
-  - python prov_interop/set_yaml_value.py localconfig/harness.yaml test-cases="$TRAVIS_BUILD_DIR/testcases"
-  - cat localconfig/*
+  - git clone https://github.com/mikej888/interop-test-harness
+  - cd interop-test-harness
+  - git checkout package
+  - source scripts/install-prov-interop-comparator.sh
+  - python setup.py install
+  - cd ..
+  - echo "Getting test cases..."
+  - git clone https://github.com/prov-suite/testcases
 # PROVSTORE_API_KEY value must be defined in Travis CI job configuration
-  - python prov_interop/set_yaml_value.py localconfig/provstore.yaml ProvStore.authorization="ApiKey $PROVSTORE_API_KEY"
 
 script: 
-  - nosetests -v prov_interop.interop_tests.test_provstore
+  - nosetests prov_interop_provstore.interop_tests.test_provstore > log.txt
