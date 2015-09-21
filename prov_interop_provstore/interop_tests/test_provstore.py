@@ -25,6 +25,9 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import inspect
+import os
+
 from nose.tools import istest
 
 from prov_interop.interop_tests.test_converter import ConverterTestCase
@@ -35,14 +38,14 @@ class ProvStoreTestCase(ConverterTestCase):
   """Interoperability tests for ProvStore.
   
   Its configuration, loaded via
-  :meth:`prov_interop.interop_tests.test_converter.ConverterTestCase.configure`,
+  :meth:`prov_interop.interop_tests.test_converter.ConverterTestCase.get_configuration`,
   is expected to be in a YAML file: 
   
   - Either provided as the value of a ``ProvStore`` key in the
     :class:`prov_interop.harness.HarnessResource` configuration. 
   - Or, named in an environment variable, 
     ``PROVSTORE_TEST_CONFIGURATION``.
-  - Or in ``localconfig/provstore.yaml``.
+  - Or, ``provstore.yaml``, co-located with this Python file.
 
   The configuration itself, within this file, is expected to have the
   key `ProvStore``. 
@@ -56,13 +59,23 @@ class ProvStoreTestCase(ConverterTestCase):
       input-formats: [provn, ttl, trig, provx, json]
       output-formats: [provn, ttl, trig, provx, json]
       skip-tests: []
+
+  An API key can also be provided via an environment variable. If the
+  environment variable ``PROVSTORE_API_KEY`` is set then this is
+  assumed to hold a ProvStore user name and API key
+  e.g. ``user:12345qwert``. If not set, then the user name and API key
+  provided in the configuration is used.
   """
 
   CONFIGURATION_FILE_ENV = "PROVSTORE_TEST_CONFIGURATION"
   """str or unicode: environment variable holding configuration file name  
   """
 
-  DEFAULT_CONFIGURATION_FILE="localconfig/provstore.yaml"
+  API_KEY_ENV = "PROVSTORE_API_KEY"
+  """str or unicode: environment variable holding ProvStore API key
+  """
+
+  DEFAULT_CONFIGURATION_FILE="provstore.yaml"
   """str or unicode: default configuration file name
   """
 
@@ -73,10 +86,21 @@ class ProvStoreTestCase(ConverterTestCase):
   def setUp(self):
     super(ProvStoreTestCase, self).setUp()
     self.converter = ProvStoreConverter()
-    super(ProvStoreTestCase, self).configure(
+    config_file = os.path.join(
+      os.path.dirname(os.path.abspath(inspect.getfile(
+        inspect.currentframe()))), ProvStoreTestCase.DEFAULT_CONFIGURATION_FILE)
+    config = super(ProvStoreTestCase, self).get_configuration(
       ProvStoreTestCase.CONFIGURATION_KEY,
       ProvStoreTestCase.CONFIGURATION_FILE_ENV,
-      ProvStoreTestCase.DEFAULT_CONFIGURATION_FILE)
+      config_file)
+    try:
+      config[ProvStoreConverter.AUTHORIZATION] = \
+        "ApiKey " + os.environ[ProvStoreTestCase.API_KEY_ENV]
+      self.converter.configure(config)
+      print("Using API key defined in " + ProvStoreTestCase.API_KEY_ENV)
+    except KeyError:
+      print("Using default API key defined in configuration file")
+    self.converter.configure(config)
 
   def tearDown(self):
     super(ProvStoreTestCase, self).tearDown()
