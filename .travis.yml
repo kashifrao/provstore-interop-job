@@ -8,11 +8,18 @@
 # curl
 # python 2.7
 # graphviz 
+#
+# PROVSTORE_API_KEY value must be defined in Travis CI job configuration
 
 language: python
 
 python:
   - 2.7
+
+env:
+  matrix:
+    - TEST_RUN="-v prov_interop_provstore/tests"
+    - TEST_RUN="prov_interop_provstore/interop_tests > log.txt"
 
 addons:
   apt:
@@ -30,7 +37,9 @@ before_install:
   - cd ..
   - echo "Getting test cases..."
   - git clone https://github.com/prov-suite/testcases
-# PROVSTORE_API_KEY value must be defined in Travis CI job configuration
 
+install:
+  - python setup.py install
+  
 script: 
-  - nosetests prov_interop_provstore.interop_tests.test_provstore > log.txt
+  - nosetests $TEST_RUN
