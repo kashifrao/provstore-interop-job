@@ -8,12 +8,11 @@ except ImportError:
 
 requirements = [
     'prov_interop',
-    'cffi',
     'requests[security]',
-    'requests-mock',
 ]
 
 test_requirements = [
+    'requests-mock',
 ]
 
 setup(

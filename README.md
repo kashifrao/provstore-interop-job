@@ -25,6 +25,7 @@ Install the interoperability test harness framework
 Install package
 
 ```
+$ pip install -r requirements
 $ python setup.py install
 ```
 
